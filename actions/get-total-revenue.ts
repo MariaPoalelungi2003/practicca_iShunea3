@@ -1,23 +1,26 @@
 import prismadb from "@/lib/prismadb";
+import { Order, OrderItem } from "@prisma/client"; // Importing the necessary types
 
-export const getTotalRevenue=async (storeId:string)=>{
+export const getTotalRevenue = async (storeId: string): Promise<number> => {
     const paidOrders = await prismadb.order.findMany({
-        where:{
+        where: {
             storeId,
-            isPaid:true,
+            isPaid: true,
         },
-        include:{
-            orderItems:{
-                include:{
-                    product:true
-                }
-            }
-        }
+        include: {
+            orderItems: {
+                include: {
+                    product: true,
+                },
+            },
+        },
     });
-    return paidOrders.reduce((total, order) => {
-        const orderTotal = order.orderItems.reduce((orderSum, item) => {
-            return orderSum + item.product.price.toNumber();
-        }, 0)
+
+    // Adding explicit type annotations
+    return paidOrders.reduce((total: number, order: Order) => {
+        const orderTotal = order.orderItems.reduce((orderSum: number, item: OrderItem) => {
+            return orderSum + item.product.price.toNumber(); // Ensure item.product.price is a Decimal and converted to number
+        }, 0);
         return total + orderTotal;
     }, 0);
-}
+};
