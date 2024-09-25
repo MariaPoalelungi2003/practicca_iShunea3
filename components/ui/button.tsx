@@ -8,6 +8,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
     className,
     children,
     disabled,
+                                                               // eslint-disable-next-line @typescript-eslint/no-unused-vars
     type = "button",
     ...props
     }, ref
