@@ -4,7 +4,7 @@ import {redirect} from "next/navigation";
 import prismadb from "@/lib/prismadb";
 import Navbar from "@/components/navbar";
 
-export default async function ({
+export default async function StoreLayout ({
     children,
     params
                                }:{
