@@ -15,9 +15,10 @@ export const getTotalRevenue = async (storeId: string) => {
         },
     });
 
-    // Adaugă tipul explicit pentru 'total'
-    const totalRevenue = paidOrders.reduce((total: number, order) => {
-        const orderTotal = order.orderItems.reduce((orderSum: number, item) => {
+    // Adaugă tipurile explicite pentru 'total', 'order' și 'item'
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    const totalRevenue = paidOrders.reduce((total: number, order: { orderItems: { product: { price: any } }[] }) => {
+        const orderTotal = order.orderItems.reduce((orderSum: number, item: { product: { price: { toNumber: () => number } } }) => {
             return orderSum + item.product.price.toNumber();
         }, 0);
         return total + orderTotal;
