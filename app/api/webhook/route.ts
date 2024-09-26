@@ -1,11 +1,10 @@
 import Stripe from "stripe";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-
 import { stripe } from "@/lib/stripe";
 import prismadb from "@/lib/prismadb";
 
-export async function POST(req:Request) {
+export async function POST(req: Request) {
     const body = await req.text();
     const signature = headers().get("Stripe-signature") as string;
 
@@ -16,10 +15,9 @@ export async function POST(req:Request) {
             body,
             signature,
             process.env.STRIPE_WEBHOOK_SECRET!
-        )
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        );
     } catch (error: any) {
-        return new NextResponse (`Webhook Error: ${error.message}`, {status: 400})
+        return new NextResponse(`Webhook Error: ${error.message}`, { status: 400 });
     }
 
     const session = event.data.object as Stripe.Checkout.Session;
@@ -38,14 +36,12 @@ export async function POST(req:Request) {
 
     if (event.type === "payment_intent.succeeded") {
         console.log("Payment intent succeeded event received");
-        // Можете добавить вывод event для полной информации
         console.log(event);
     } else {
         console.log("Unhandled event type:", event.type);
     }
 
-
-    if(event.type === "checkout.session.completed") {
+    if (event.type === "checkout.session.completed") {
         const order = await prismadb.order.update({
             where: {
                 id: session?.metadata?.orderId,
@@ -60,7 +56,8 @@ export async function POST(req:Request) {
             }
         });
 
-        const productIds = order.orderItems.map((orderItem) => orderItem.productId);
+        // Adaugă tipul explicit pentru `orderItem`
+        const productIds = order.orderItems.map((orderItem: { productId: string }) => orderItem.productId);
 
         await prismadb.product.updateMany({
             where: {
@@ -75,5 +72,5 @@ export async function POST(req:Request) {
         });
     }
 
-    return new NextResponse(null, {status: 200});
+    return new NextResponse(null, { status: 200 });
 }
