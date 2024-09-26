@@ -1,18 +1,17 @@
 import { format } from "date-fns";
-
 import prismadb from "@/lib/prismadb";
 import { ProductClient } from "./components/client";
 import { ProductColumn } from "./components/columns";
 import { formatter } from "@/lib/utils";
 
 const ProductsPage = async ({
-    params
-}: {
-    params: {storeId: string}
+                                params,
+                            }: {
+    params: { storeId: string };
 }) => {
     const products = await prismadb.product.findMany({
         where: {
-            storeId: params.storeId
+            storeId: params.storeId,
         },
         include: {
             category: true,
@@ -20,29 +19,42 @@ const ProductsPage = async ({
             color: true,
         },
         orderBy: {
-            createdAt: 'desc'
-        }
+            createdAt: "desc",
+        },
     });
-    
-    const formattedProducts: ProductColumn[] = products.map(( item ) => ({
-        id: item.id,
-        name: item.name,
-        isFutured: item.isFutured,
-        isArchived: item.isArchived,
-        price: formatter.format(item.price.toNumber()),
-        category: item.category.name,
-        size: item.size.name,
-        color: item.color.value,
-        createdAt: format(item.createdAt, "MMMM do, yyyy")
-    }))
+
+    // Adăugarea tipului explicit pentru 'item'
+    const formattedProducts: ProductColumn[] = products.map(
+        (item: {
+            id: string;
+            name: string;
+            isFutured: boolean;
+            isArchived: boolean;
+            price: { toNumber: () => number };
+            category: { name: string };
+            size: { name: string };
+            color: { value: string };
+            createdAt: Date;
+        }) => ({
+            id: item.id,
+            name: item.name,
+            isFutured: item.isFutured,
+            isArchived: item.isArchived,
+            price: formatter.format(item.price.toNumber()),
+            category: item.category.name,
+            size: item.size.name,
+            color: item.color.value,
+            createdAt: format(item.createdAt, "MMMM do, yyyy"),
+        })
+    );
 
     return (
         <div className="flex-col">
             <div className="flex-1 space-y-4 p-8 pt-6">
-                <ProductClient data={formattedProducts}/>
+                <ProductClient data={formattedProducts} />
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default ProductsPage;
