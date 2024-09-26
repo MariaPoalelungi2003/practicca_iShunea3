@@ -1,10 +1,8 @@
-import { create } from "zustand";
-
+import { create } from "zustand"; // Import corect din 'zustand'
 
 interface UseStoreModalStore {
     isOpen: boolean;
     onOpen: () => void;
-
     onClose: () => void;
 }
 
