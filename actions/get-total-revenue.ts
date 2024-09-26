@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import prismadb from "@/lib/prismadb";
+import prismadb  from "@/lib/prismadb";
 
 interface BillboardColumn {
     id: string;
